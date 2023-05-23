@@ -241,7 +241,7 @@ class AlphaBeta:
         self.joueur = grille.joueur_actuel
 
     def alpha_beta(self):
-        action, eval = self.alpha_beta_rec(self.grille, self.profondeur, True, -np.inf, np.inf)
+        action, eval_score = self.alpha_beta_rec(self.grille, self.profondeur, True, -np.inf, np.inf)
         return action
 
     def alpha_beta_rec(self, grille, profondeur, actuel, alpha, beta):
@@ -328,13 +328,13 @@ class AlphaBeta:
 
 
 total = 0
-max = 50
-'''for i in range(max):
+maxxxx = 50
+for i in range(maxxxx):
     jeu = Puissance4()
-    iaaa = minmax(jeu, 3)
+    iaaa = AlphaBeta(jeu, 3)
     total+=iaaa.jouer_puissance4()
-print("Nombre de fois où l'IA gagne contre l'aléatoire :", total"/",max)'''
+print("Nombre de fois où l'IA gagne contre l'aléatoire :", total,"/",maxxxx)
 # jeu.jouer_puissance4()
-jeu = Puissance4()
+#jeu = Puissance4()
 #iaaaaa = AlphaBeta(jeu, 4)
 #iaaaaa.jouer_puissance4()
