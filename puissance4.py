@@ -57,51 +57,47 @@ class puissance4:
             else:
                 count = 0
 
-        # Check ascending diagonal
-        count = 0
-        start_row = last_row
-        start_col = last_col
-        while start_row > 0 and start_col > 0:
-            start_row -= 1
-            start_col -= 1
-        end_row = last_row
-        end_col = last_col
-        while end_row < self.taille_grille[0] - 1 and end_col < self.taille_grille[1] - 1:
-            end_row += 1
-            end_col += 1
-        while start_row <= end_row - 3 and start_col <= end_col - 3:
-            if self.grille[start_row][start_col] == joueur:
-                count += 1
-                if count == 4:
+        for i in range(self.taille_grille[0] - 3):
+            for j in range(self.taille_grille[1] - 3):
+                if np.all(np.diag(self.grille[i:i + 4, j:j + 4]) == joueur):
                     return True
-            else:
-                count = 0
-            start_row += 1
-            start_col += 1
 
-        # Check descending diagonal
-        count = 0
-        start_row = last_row
-        start_col = last_col
-        while start_row < self.taille_grille[0] - 1 and start_col > 0:
-            start_row += 1
-            start_col -= 1
-        end_row = last_row
-        end_col = last_col
-        while end_row > 0 and end_col < self.taille_grille[1] - 1:
-            end_row -= 1
-            end_col += 1
-        while start_row >= end_row + 3 and start_col <= end_col - 3:
-            if self.grille[start_row][start_col] == joueur:
-                count += 1
-                if count == 4:
+        # Vérification des diagonales descendantes
+        for i in range(self.taille_grille[0] - 3):
+            for j in range(self.taille_grille[1] - 3):
+                if np.all(np.diag(np.fliplr(self.grille[i:i + 4, j:j + 4])) == joueur):
                     return True
-            else:
-                count = 0
-            start_row -= 1
-            start_col += 1
 
         return False
+
+    '''def verif_victoire(self):
+        joueur = self.joueur_actuel
+
+        # Vérification des lignes
+        for i in range(self.taille_grille[0]):
+            for j in range(self.taille_grille[1] - 3):
+                if np.all(self.grille[i, j:j + 4] == joueur):
+                    return True
+
+        # Vérification des colonnes
+        for i in range(self.taille_grille[0] - 3):
+            for j in range(self.taille_grille[1]):
+                if np.all(self.grille[i:i + 4, j] == joueur):
+                    return True
+
+        # Vérification des diagonales ascendantes
+        for i in range(self.taille_grille[0] - 3):
+            for j in range(self.taille_grille[1] - 3):
+                if np.all(np.diag(self.grille[i:i + 4, j:j + 4]) == joueur):
+                    return True
+
+        # Vérification des diagonales descendantes
+        for i in range(self.taille_grille[0] - 3):
+            for j in range(self.taille_grille[1] - 3):
+                if np.all(np.diag(np.fliplr(self.grille[i:i + 4, j:j + 4])) == joueur):
+                    return True
+
+        return False'''
 
     def jouer_puissance4(self):
         while not self.fin_jeu:
@@ -165,7 +161,7 @@ class puissance4:
         if autre:
             negatif = -1
         if np.all(ligne == joueur):
-            eval_list.append(1000* negatif)
+            eval_list.append(1000 * negatif)
         elif np.all(ligne[:-1] == joueur) and ligne[-1] == 0:
             eval_list.append(50 * negatif)
         elif np.all(ligne[:-2] == joueur) and (ligne[-2] == 0 or ligne[-1] == 0):
@@ -187,6 +183,4 @@ class puissance4:
             for ligne in range(taille_grille[0] - 1, -1, -1):
                 if self.grille[ligne][colonne] == 0:
                     indices_accessibles.append((ligne, colonne))
-                    break
-
         return indices_accessibles

@@ -1,19 +1,18 @@
 import copy as cp
-import math
 import random
 
 import numpy as np
 
 
 class mcts:
-    def __init__(self, grille, joueur):
+    def __init__(self, grille):
         self.grille = grille
-        self.joueur = joueur
+        self.joueur = 1
 
     def utcsearch(self, grille,joueur):
         state = State(grille, joueur)
         root = Node(state)
-        for i in range(1):
+        for i in range(500):
             node = self.treePolicy(root)
             reward = self.defaultPolicy(node)
             self.backup(node, reward)
@@ -31,11 +30,14 @@ class mcts:
     def expand(self, node):
         tried_children = [child.state for child in node.children]
         new_state = node.state.get_next_state()
-        while new_state in tried_children:
+        while new_state in tried_children and new_state is not None:
+            tried_children.remove(new_state)
             new_state = node.state.get_next_state()
-        node.addChild(new_state)
-        return node.children[-1]
-
+        if new_state is not None:
+            node.addChild(new_state)
+            return node.children[-1]
+        else:
+            return node
     def bestChild(self, node):
         bestscore = -np.inf
         bestchildren = []
@@ -43,10 +45,6 @@ class mcts:
             exploit = child.reward / child.visits
             explore = 1.2*np.sqrt(2.0 * np.log(node.visits) / child.visits)
             score = exploit + explore
-            print("Child:", child.state.last_action)
-            print("Exploit:", exploit)
-            print("Explore:", explore)
-            print("Score:", score)
             if score == bestscore:
                 bestchildren.append(child)
             if score > bestscore:
@@ -68,12 +66,11 @@ class mcts:
 
     def jouer_puissance4(self):
         while not self.grille.fin_jeu:
-            # self.grille.afficher_grille()
+            self.grille.afficher_grille()
             # time.sleep(1)
             # Demande à l'utilisateur de choisir la colonne
             if self.grille.joueur_actuel == 1:
                 self.grille.placer_jeton(self.utcsearch(self.grille,1))
-                self.joueur = 1
             else:
 
                 pose = False
@@ -96,10 +93,9 @@ class mcts:
                 print("Match nul !")
                 self.grille.fin_jeu = True
                 return 0
-            self.grille.afficher_grille()
             # Changer de joueur
             self.grille.joueur_actuel = 3 - self.grille.joueur_actuel
-
+            self.joueur = 3 - self.joueur
 
 class Node:
     def __init__(self, state, parent=None):
@@ -119,10 +115,6 @@ class Node:
         self.visits += 1
         self.isFullyExpanded = True
 
-    def __repr__(self):
-        s = "Node; children: %d; visits: %d; reward: %f" % (len(self.children), self.visits, self.reward)
-        return s
-
 
 class State:
     def __init__(self, grille, joueur):
@@ -134,7 +126,12 @@ class State:
         self.last_action = 0
 
     def is_terminal_state(self):
-        return self.grille.verif_victoire() or self.grille.nb_coups == self.grille.taille_grille[0] * self.grille.taille_grille[1]
+        if self.grille.verif_victoire():
+            return True
+        elif len(self.grille.indices_cases_accessibles()) <= 0:
+            return True
+        else:
+            return False
 
     def expand(self):
         coups_possibles = self.grille.indices_cases_accessibles()
@@ -144,16 +141,21 @@ class State:
             grille_copie.placer_jeton(coup[1])
             enfant = State(grille_copie, 3 - self.joueur)
             self.enfants.append(enfant)
-            self.last_action = coup[1]
+            enfant.update(0)
+            enfant.last_action = coup[1]
+
 
     def update(self, recompense):
         self.nb_visites += 1
         self.recompense += recompense
 
     def get_next_state(self):
-        if not self.enfants:
+        if len(self.enfants) == 0:  # Vérifier si l'expansion est nécessaire
             self.expand()
-        return random.choice(self.enfants)
+        if len(self.enfants) > 0:
+            return random.choice(self.enfants)
+        else:
+            return None
 
     def reward(self):
         if self.grille.verif_victoire():

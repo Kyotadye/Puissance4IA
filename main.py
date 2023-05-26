@@ -4,10 +4,11 @@ from mcts import mcts
 from puissance4 import puissance4
 
 total = 0
-maxxxx = 1
+maxxxx = 10
 for i in range(maxxxx):
     jeu = puissance4()
-    iaaa = mcts(jeu, 1)
+    #*jeu.jouer_puissance4()
+    iaaa = mcts(jeu)
     total += iaaa.jouer_puissance4()
     print(i)
 print("Nombre de fois où l'IA gagne contre l'aléatoire :", total, "/", maxxxx)
