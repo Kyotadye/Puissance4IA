@@ -120,7 +120,7 @@ class puissance4:
         if autre:
             negatif = -1
         if np.all(ligne == joueur):
-            eval_list.append(1000 * negatif)
+            eval_list.append(1000* negatif)
         elif np.all(ligne[:-1] == joueur) and ligne[-1] == 0:
             eval_list.append(50 * negatif)
         elif np.all(ligne[:-2] == joueur) and (ligne[-2] == 0 or ligne[-1] == 0):

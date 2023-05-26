@@ -25,12 +25,13 @@ class alpha_beta:
         if self.joueur == 2:
             actuel = False
         if actuel:
-            joueur_actuel = grille.joueur_actuel
-            joueur_autre = 3 - joueur_actuel
+            joueur_actuel = self.joueur
+            joueur_autre = 3 - self.joueur
 
             for colonne in range(grille.taille_grille[1]):
                 if grille.grille[0][colonne] == 0:
                     grille_temp = cp.deepcopy(grille)
+                    grille_temp.joueur_actuel = joueur_actuel
                     grille_temp.placer_jeton(colonne)
 
                     grille_temp.joueur_actuel = joueur_autre
