@@ -182,5 +182,5 @@ class puissance4:
         for colonne in range(taille_grille[1]):
             for ligne in range(taille_grille[0] - 1, -1, -1):
                 if self.grille[ligne][colonne] == 0:
-                    indices_accessibles.append((ligne, colonne))
+                    indices_accessibles.append(colonne)
         return indices_accessibles
