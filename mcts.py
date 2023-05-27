@@ -32,9 +32,9 @@ class Node:
     def get_next_state(self):
         return random.choice(self.children)
 
-    def reward_fct(self):
+    def reward_fct(self, joueur):
         if self.grille.verif_victoire():
-            if self.joueur == self.grille.joueur_actuel:
+            if joueur == self.grille.joueur_actuel:
                 self.update(1)
             else:
                 self.update(-1)
@@ -63,13 +63,15 @@ class mcts:
 
     def expand(self, node):
         coups_possibles = node.grille.indices_cases_accessibles()
-        coups_restants = [coup for coup in coups_possibles if coup not in [child.last_action for child in node.children]]
+        coups_restants = [coup for coup in coups_possibles if
+                          coup not in [child.last_action for child in node.children]]
         for coup in coups_restants:
             grille_copie = cp.deepcopy(node.grille)
             grille_copie.joueur_actuel = node.joueur
             grille_copie.placer_jeton(coup)
             node.addChild(grille_copie, 3 - node.joueur, coup)
             node.children[-1].last_action = coup
+            node.children[-1].visits += 1
         if len(node.children) == len(coups_possibles):
             node.isFullyExpanded = True
         return node
@@ -94,12 +96,12 @@ class mcts:
     def defaultPolicy(self, node):
         while not node.children == []:
             node = node.get_next_state()
-        return node.reward_fct()
+        return node.reward_fct(self.joueur)
 
     def backup(self, node, reward):
         while node is not None:
             node.visits += 1
-            if node.joueur == 3 - self.joueur:
+            if node.joueur == self.joueur:
                 reward = -reward
             else:
                 reward = reward
