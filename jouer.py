@@ -63,7 +63,7 @@ class jouer:
         if self.classchoix == None:
             self.choix()
         while not self.grille.fin_jeu:
-            #self.grille.afficher_grille()
+            self.grille.afficher_grille()
             # Demande à l'utilisateur de choisir la colonne
             if self.grille.joueur_actuel == 1:
                 if self.classchoix[0] != 0 and self.classchoix[0] != 1:
