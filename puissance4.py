@@ -99,27 +99,6 @@ class puissance4:
 
         return False'''
 
-    def jouer_puissance4(self):
-        while not self.fin_jeu:
-            self.afficher_grille()
-
-            # Demande à l'utilisateur de choisir la colonne
-            colonne = int(input(f"Joueur {self.joueur_actuel}, choisissez la colonne (0-6) : "))
-
-            self.placer_jeton(colonne)
-            self.nb_coups += 1
-            if self.verif_victoire():
-                self.afficher_grille()
-                print(f"Joueur {self.joueur_actuel} a gagné !")
-                self.fin_jeu = True
-            elif self.nb_coups == self.taille_grille[0] * self.taille_grille[1]:
-                self.afficher_grille()
-                print("Match nul !")
-                self.fin_jeu = True
-
-            # Changer de joueur
-            self.joueur_actuel = 3 - self.joueur_actuel
-
     def evaluer(self, joueur):
         joueur_autre = 3 - joueur
         eval = 0

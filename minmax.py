@@ -55,34 +55,7 @@ class minmax:
                         min_eval = eval_score
             return min_colonne, min_eval
 
-    def jouer_puissance4(self):
-        while not self.grille.fin_jeu:
-            # self.grille.afficher_grille()
-            # time.sleep(1)
-            # Demande à l'utilisateur de choisir la colonne
-            if self.grille.joueur_actuel == 2:
-                self.grille.placer_jeton(self.minmaxfunc())
-                self.joueur = 2
-            else:
-                pose = False
-                while not pose:
-                    colonne = random.randint(0, 6)
-                    if self.grille.grille[0][colonne] == 0:
-                        self.grille.placer_jeton(colonne)
-                        pose = True
-            self.grille.nb_coups += 1
-            if self.grille.verif_victoire():
-                self.grille.fin_jeu = True
-                if self.grille.joueur_actuel == 2:
-                    return 1
-                self.grille.afficher_grille()
-                print(f"Joueur {self.grille.joueur_actuel} a gagné !")
-                return 0
-            elif self.grille.nb_coups == self.grille.taille_grille[0] * self.grille.taille_grille[1]:
-                self.grille.afficher_grille()
-                print("Match nul !")
-                self.grille.fin_jeu = True
-                return 0
+    def jouer(self, joueur):
+        self.grille.placer_jeton(self.minmaxfunc())
+        self.joueur = joueur
 
-            # Changer de joueur
-            self.grille.joueur_actuel = 3 - self.grille.joueur_actuel

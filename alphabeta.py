@@ -8,7 +8,7 @@ class alpha_beta:
     def __init__(self, grille, profondeur):
         self.grille = grille
         self.profondeur = profondeur
-        self.joueur = grille.joueur_actuel
+        self.joueur = 1
 
     def alpha_beta(self):
         action, eval_score = self.alpha_beta_rec(self.grille, self.profondeur, True, -np.inf, np.inf)
@@ -101,3 +101,7 @@ class alpha_beta:
 
             # Changer de joueur
             self.grille.joueur_actuel = 3 - self.grille.joueur_actuel
+
+    def jouer(self, joueur):
+        self.grille.placer_jeton(self.alpha_beta())
+        self.joueur = joueur
