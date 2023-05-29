@@ -15,6 +15,7 @@ class Node:
         self.visits = 1
         self.children = []
         self.isFullyExpanded = False
+        self.first = True
 
     def addChild(self, grille, joueur, last_action):
         child = Node(grille, joueur, self, last_action)
@@ -30,21 +31,31 @@ class Node:
     def reward_fct(self, joueur):
         if self.grille.verif_victoire():
             if joueur == self.grille.joueur_actuel:
-                self.reward += 1
+                # print("VICTOIRE")
+                self.reward = 1
             else:
-                self.reward += -2
+                # print("DEFAITE")
+                self.reward = -1
         else:
-            self.reward += 0.5
+            self.reward = 0
         return self.reward
 
 
 class mcts:
     def utcsearch(self, grille, joueur):
         root = Node(grille, joueur)
-        for i in range(10000):
+        for i in range(1000):
             node = self.treePolicy(root)
             reward = self.defaultPolicy(node)
-            self.backup(node, reward)
+            #self.backup(node, reward)
+        for i in range(len(root.children)):
+            print("REWARD GOSSE : ", i, ":", root.children[i].reward)
+            print("VISITS GOSSE : ", i, ":", root.children[i].visits)
+            print("ACTION GOSSE : ", i, ":", root.children[i].last_action)
+        print("GOSSES : ", len(root.children))
+        print(root.reward)
+        print(root.visits)
+        time.sleep(1)
         bestchild = self.bestChild(root)
         return bestchild.last_action
 
@@ -60,19 +71,21 @@ class mcts:
         coups_possibles = node.grille.indices_cases_accessibles()
         coups_restants = [coup for coup in coups_possibles if
                           coup not in [child.last_action for child in node.children]]
+        '''print("COUPS POSSIBLES : ", coups_possibles)
+        print("COUPS RESTANTS : ", coups_restants)
+        print("GOSSES : ",len(node.children))
+        time.sleep(1)'''
         if not coups_possibles:
             node.isFullyExpanded = True
             return node
-        if len(node.children) == len(coups_possibles):
-            node.isFullyExpanded = True
-        if coups_restants:
+        if coups_restants and not node.isFullyExpanded:
             coup = random.choice(coups_restants)
             grille_copie = cp.deepcopy(node.grille)
             grille_copie.joueur_actuel = node.joueur
             grille_copie.placer_jeton(coup)
             '''print("GRILLE COPIE")
             grille_copie.afficher_grille()
-            time.sleep(2)'''
+            time.sleep(1)'''
             node.addChild(grille_copie, 3 - node.joueur, coup)
             return node.children[-1]
         return node
@@ -82,28 +95,34 @@ class mcts:
         bestchildren = []
         for child in node.children:
             exploit = child.reward / child.visits
-            explore = 1.2 * np.sqrt(2.0 * np.log(node.visits) / child.visits)
+            explore = 1.2 * np.sqrt((2.0 * np.log(node.visits)) / child.visits)
+            # print("EXPLOIT",exploit)
+            # print("EXPLORE",explore)
             score = exploit + explore
+            # print("SCORE",score)
             if score == bestscore:
                 bestchildren.append(child)
             if score > bestscore:
                 bestchildren = [child]
                 bestscore = score
+        time.sleep(1)
         res = random.choice(bestchildren)
         return res
 
     def defaultPolicy(self, node):
         while not node.is_terminal_state():
             node = random.choice(node.children) if node.children else self.expand(node)
+            self.backup(node, 1)
         return node.reward_fct(self.joueur)
 
     def backup(self, node, reward):
         while node is not None:
             node.visits += 1
+            # print(node.joueur)
             if node.joueur == self.joueur:
-                reward = -reward
-            else:
                 reward = reward
+            else:
+                reward = -reward
             node.reward += reward
             '''print("VISITS : ", node.visits)
             print("REWARD : ", node.reward)'''
