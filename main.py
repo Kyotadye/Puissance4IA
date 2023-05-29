@@ -1,3 +1,5 @@
+import time
+
 from jouer import jouer
 
 if __name__ == '__main__':

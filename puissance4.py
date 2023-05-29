@@ -57,7 +57,7 @@ class puissance4:
             else:
                 count = 0
 
-        for i in range(self.taille_grille[0] - 3):
+        '''for i in range(self.taille_grille[0] - 3):
             for j in range(self.taille_grille[1] - 3):
                 if np.all(np.diag(self.grille[i:i + 4, j:j + 4]) == joueur):
                     return True
@@ -66,6 +66,24 @@ class puissance4:
         for i in range(self.taille_grille[0] - 3):
             for j in range(self.taille_grille[1] - 3):
                 if np.all(np.diag(np.fliplr(self.grille[i:i + 4, j:j + 4])) == joueur):
+                    return True'''
+        # Vérification des diagonales descendantes affectées par l'ajout du pion
+        min_row = max(last_row - 3, 0)
+        max_row = min(last_row + 3, self.taille_grille[0] - 1)
+        min_col = max(last_col - 3, 0)
+        max_col = min(last_col + 3, self.taille_grille[1] - 1)
+
+        for i in range(min_row, max_row - 2):
+            for j in range(min_col, max_col - 2):
+                if (self.grille[i][j] == joueur and self.grille[i + 1][j + 1] == joueur
+                        and self.grille[i + 2][j + 2] == joueur and self.grille[i + 3][j + 3] == joueur):
+                    return True
+
+        # Vérification des diagonales ascendantes affectées par l'ajout du pion
+        for i in range(min_row + 3, max_row + 1):
+            for j in range(min_col, max_col - 2):
+                if (self.grille[i][j] == joueur and self.grille[i - 1][j + 1] == joueur
+                        and self.grille[i - 2][j + 2] == joueur and self.grille[i - 3][j + 3] == joueur):
                     return True
 
         return False
