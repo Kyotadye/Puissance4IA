@@ -2,7 +2,7 @@ from jouer import jouer
 
 if __name__ == '__main__':
     total = 0
-    maxxxx = 10
+    maxxxx = 20
     jeu = jouer()
     for i in range(maxxxx):
         total += jeu.jouer_puissance4()
