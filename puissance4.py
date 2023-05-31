@@ -57,16 +57,6 @@ class puissance4:
             else:
                 count = 0
 
-        '''for i in range(self.taille_grille[0] - 3):
-            for j in range(self.taille_grille[1] - 3):
-                if np.all(np.diag(self.grille[i:i + 4, j:j + 4]) == joueur):
-                    return True
-
-        # Vérification des diagonales descendantes
-        for i in range(self.taille_grille[0] - 3):
-            for j in range(self.taille_grille[1] - 3):
-                if np.all(np.diag(np.fliplr(self.grille[i:i + 4, j:j + 4])) == joueur):
-                    return True'''
         # Vérification des diagonales descendantes affectées par l'ajout du pion
         min_row = max(last_row - 3, 0)
         max_row = min(last_row + 3, self.taille_grille[0] - 1)
@@ -87,35 +77,6 @@ class puissance4:
                     return True
 
         return False
-
-    '''def verif_victoire(self):
-        joueur = self.joueur_actuel
-
-        # Vérification des lignes
-        for i in range(self.taille_grille[0]):
-            for j in range(self.taille_grille[1] - 3):
-                if np.all(self.grille[i, j:j + 4] == joueur):
-                    return True
-
-        # Vérification des colonnes
-        for i in range(self.taille_grille[0] - 3):
-            for j in range(self.taille_grille[1]):
-                if np.all(self.grille[i:i + 4, j] == joueur):
-                    return True
-
-        # Vérification des diagonales ascendantes
-        for i in range(self.taille_grille[0] - 3):
-            for j in range(self.taille_grille[1] - 3):
-                if np.all(np.diag(self.grille[i:i + 4, j:j + 4]) == joueur):
-                    return True
-
-        # Vérification des diagonales descendantes
-        for i in range(self.taille_grille[0] - 3):
-            for j in range(self.taille_grille[1] - 3):
-                if np.all(np.diag(np.fliplr(self.grille[i:i + 4, j:j + 4])) == joueur):
-                    return True
-
-        return False'''
 
     def evaluer(self, joueur):
         joueur_autre = 3 - joueur
@@ -181,4 +142,5 @@ class puissance4:
                 if self.grille[ligne][colonne] == 0:
                     if colonne not in indices_accessibles:
                         indices_accessibles.append(colonne)
+                        break
         return indices_accessibles

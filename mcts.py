@@ -22,9 +22,11 @@ class Node:
         self.children.append(child)
 
     def is_terminal_state(self):
-        if self.grille.verif_victoire():
+        if self.grille.nb_coups >= 42:
             return True
-        elif len(self.grille.indices_cases_accessibles()) <= 0:
+        if len(self.grille.indices_cases_accessibles()) <= 0:
+            return True
+        elif self.grille.verif_victoire():
             return True
         return False
 
@@ -32,21 +34,21 @@ class Node:
         if self.grille.verif_victoire():
             if joueur == self.grille.joueur_actuel:
                 # print("VICTOIRE")
-                self.reward = 1
+                return 50
             else:
                 # print("DEFAITE")
-                self.reward = -1
+                return 1
         else:
-            self.reward = 0
-        return self.reward
+            # print("NUL")
+            return 0
 
 
 class mcts:
     def utcsearch(self, grille, joueur):
         root = Node(grille, joueur)
-        for i in range(1000):
+        for i in range(10000):
             node = self.treePolicy(root)
-            reward = self.defaultPolicy(node)
+            self.defaultPolicy(node)
             #self.backup(node, reward)
         for i in range(len(root.children)):
             print("REWARD GOSSE : ", i, ":", root.children[i].reward)
@@ -95,7 +97,7 @@ class mcts:
         bestchildren = []
         for child in node.children:
             exploit = child.reward / child.visits
-            explore = 1.2 * np.sqrt((2.0 * np.log(node.visits)) / child.visits)
+            explore = 1.5 * np.sqrt((2.0 * np.log(node.visits)) / child.visits)
             # print("EXPLOIT",exploit)
             # print("EXPLORE",explore)
             score = exploit + explore
@@ -105,24 +107,23 @@ class mcts:
             if score > bestscore:
                 bestchildren = [child]
                 bestscore = score
-        time.sleep(1)
         res = random.choice(bestchildren)
         return res
 
     def defaultPolicy(self, node):
         while not node.is_terminal_state():
             node = random.choice(node.children) if node.children else self.expand(node)
-            self.backup(node, 1)
-        return node.reward_fct(self.joueur)
+            self.backup(node, node.reward_fct(self.joueur))
+        #return node.reward_fct(self.joueur)
 
     def backup(self, node, reward):
         while node is not None:
             node.visits += 1
             # print(node.joueur)
             if node.joueur == self.joueur:
-                reward = reward
-            else:
                 reward = -reward
+            else:
+                reward = reward
             node.reward += reward
             '''print("VISITS : ", node.visits)
             print("REWARD : ", node.reward)'''
