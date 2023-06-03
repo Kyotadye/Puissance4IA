@@ -4,7 +4,7 @@ from jouer import jouer
 
 if __name__ == '__main__':
     total = 0
-    maxxxx = 20
+    maxxxx = int(input("Nombre de parties à jouer : "))
     jeu = jouer()
     for i in range(maxxxx):
         start = time.time()
