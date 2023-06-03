@@ -50,14 +50,14 @@ class mcts:
             node = self.treePolicy(root)
             self.defaultPolicy(node)
             #self.backup(node, reward)
-        for i in range(len(root.children)):
+        '''for i in range(len(root.children)):
             print("REWARD GOSSE : ", i, ":", root.children[i].reward)
             print("VISITS GOSSE : ", i, ":", root.children[i].visits)
             print("ACTION GOSSE : ", i, ":", root.children[i].last_action)
         print("GOSSES : ", len(root.children))
         print(root.reward)
         print(root.visits)
-        time.sleep(1)
+        time.sleep(1)'''
         bestchild = self.bestChild(root)
         return bestchild.last_action
 
