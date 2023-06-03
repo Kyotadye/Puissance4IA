@@ -1,38 +1,36 @@
 import time
-
 import numpy as np
 import random
 import copy as cp
 
-
 class Node:
     def __init__(self, grille, joueur, parent=None, last_action=0):
-        self.grille = grille
-        self.joueur = joueur
-        self.parent = parent
-        self.last_action = last_action
-        self.reward = 0
-        self.visits = 1
-        self.children = []
-        self.isFullyExpanded = False
-        self.first = True
+        self.grille = grille  # La grille de jeu associée à ce nœud
+        self.joueur = joueur  # Le joueur associé à ce nœud
+        self.parent = parent  # Le nœud parent dans l'arbre de recherche
+        self.last_action = last_action  # L'action qui a conduit à ce nœud
+        self.reward = 0  # La récompense cumulée jusqu'à présent pour ce nœud
+        self.visits = 1  # Le nombre de visites pour ce nœud
+        self.children = []  # Les enfants de ce nœud
+        self.isFullyExpanded = False  # Indicateur pour vérifier si le nœud est complètement étendu
+        self.first = True  # Indicateur pour marquer le premier nœud
 
     def addChild(self, grille, joueur, last_action):
         child = Node(grille, joueur, self, last_action)
         self.children.append(child)
 
     def is_terminal_state(self):
-        if self.grille.nb_coups >= 42:
+        if self.grille.nb_coups >= 42:  # Si tous les coups ont été joués et la grille est pleine
             return True
-        if len(self.grille.indices_cases_accessibles()) <= 0:
+        if len(self.grille.indices_cases_accessibles()) <= 0:  # Si aucun coup possible dans la grille
             return True
-        elif self.grille.verif_victoire():
+        elif self.grille.verif_victoire():  # Si un joueur a remporté la partie
             return True
         return False
 
     def reward_fct(self, joueur):
         if self.grille.verif_victoire():
-            if joueur == self.grille.joueur_actuel:
+            if joueur == self.grille.joueur_actuel:  # Si le joueur associé à ce nœud a gagné
                 # print("VICTOIRE")
                 return 50
             else:
@@ -46,22 +44,19 @@ class Node:
 class mcts:
     def utcsearch(self, grille, joueur):
         root = Node(grille, joueur)
+
+        # Effectue une recherche Monte Carlo Tree Search pour un certain nombre d'itérations
         for i in range(10000):
             node = self.treePolicy(root)
             self.defaultPolicy(node)
             #self.backup(node, reward)
-        '''for i in range(len(root.children)):
-            print("REWARD GOSSE : ", i, ":", root.children[i].reward)
-            print("VISITS GOSSE : ", i, ":", root.children[i].visits)
-            print("ACTION GOSSE : ", i, ":", root.children[i].last_action)
-        print("GOSSES : ", len(root.children))
-        print(root.reward)
-        print(root.visits)
-        time.sleep(1)'''
+
+        # Sélectionne le meilleur enfant à partir du nœud racine
         bestchild = self.bestChild(root)
         return bestchild.last_action
 
     def treePolicy(self, node):
+        # Applique la politique de sélection de l'arbre jusqu'à atteindre un nœud terminal
         while not node.is_terminal_state():
             if not node.isFullyExpanded:
                 return self.expand(node)
@@ -71,15 +66,18 @@ class mcts:
 
     def expand(self, node):
         coups_possibles = node.grille.indices_cases_accessibles()
-        coups_restants = [coup for coup in coups_possibles if
-                          coup not in [child.last_action for child in node.children]]
+        coups_restants = [coup for coup in coups_possibles if coup not in [child.last_action for child in node.children]]
         '''print("COUPS POSSIBLES : ", coups_possibles)
         print("COUPS RESTANTS : ", coups_restants)
         print("GOSSES : ",len(node.children))
         time.sleep(1)'''
+
+        # Si aucun coup possible ou tous les coups ont déjà été explorés, marquer le nœud comme complètement étendu
         if not coups_possibles:
             node.isFullyExpanded = True
             return node
+
+        # Si des coups restent à explorer, en choisir un aléatoirement et ajouter un nouvel enfant au nœud actuel
         if coups_restants and not node.isFullyExpanded:
             coup = random.choice(coups_restants)
             grille_copie = cp.deepcopy(node.grille)
@@ -95,6 +93,8 @@ class mcts:
     def bestChild(self, node):
         bestscore = -np.inf
         bestchildren = []
+
+        # Trouve le meilleur score parmi les enfants du nœud donné
         for child in node.children:
             exploit = child.reward / child.visits
             explore = 1.5 * np.sqrt((2.0 * np.log(node.visits)) / child.visits)
@@ -102,21 +102,28 @@ class mcts:
             # print("EXPLORE",explore)
             score = exploit + explore
             # print("SCORE",score)
+
+            # Si le score est égal au meilleur score, ajoute l'enfant à la liste des meilleurs enfants
             if score == bestscore:
                 bestchildren.append(child)
+            # Si le score est meilleur que le meilleur score précédent, met à jour la liste des meilleurs enfants
             if score > bestscore:
                 bestchildren = [child]
                 bestscore = score
+
+        # Choisi un enfant aléatoire parmi les meilleurs enfants
         res = random.choice(bestchildren)
         return res
 
     def defaultPolicy(self, node):
+        # Effectue une politique par défaut aléatoire jusqu'à atteindre un nœud terminal
         while not node.is_terminal_state():
             node = random.choice(node.children) if node.children else self.expand(node)
             self.backup(node, node.reward_fct(self.joueur))
         #return node.reward_fct(self.joueur)
 
     def backup(self, node, reward):
+        # Remonte l'arbre et met à jour les récompenses et les visites des nœuds
         while node is not None:
             node.visits += 1
             # print(node.joueur)
