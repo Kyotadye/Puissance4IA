@@ -22,6 +22,7 @@ class puissance4:
             print()
         print()
 
+
     def placer_jeton(self, colonne):
         for i in range(self.taille_grille[0] - 1, -1, -1):
             if self.grille[i][colonne] == 0:
@@ -32,7 +33,6 @@ class puissance4:
     def verif_victoire(self):
         joueur = self.joueur_actuel
         last_row, last_col = self.last_move
-
         # Check horizontal line
         count = 0
         start_col = max(0, last_col - 3)
@@ -78,7 +78,38 @@ class puissance4:
 
         return False
 
-    def evaluer(self, joueur):
+    def evaluer(self, joueur,evalval):
+        if(evalval == 1):
+            return self.evaluer_pos(joueur)
+        return self.evaluer_comb(joueur)
+
+    def evaluer_pos(self, joueur):
+        joueur_autre = 3 - joueur
+        eval = 0
+        if self.verif_victoire():
+            if self.joueur_actuel == joueur_autre:
+                return -10000
+            else:
+                return 1000
+        for i in range(self.taille_grille[0]):
+            for j in range(self.taille_grille[1]):
+                if self.grille[i][j] == joueur:
+                    negatif = 1
+                elif self.grille[i][j] == joueur_autre:
+                    negatif = -1
+                else:
+                    negatif = 0
+                if j == 0 or j == self.taille_grille[1] - 1:
+                    eval += 1 * negatif
+                if j == 1 or j == self.taille_grille[1] - 2:
+                    eval += 10 * negatif
+                if j == 2 or j == self.taille_grille[1] - 3:
+                    eval += 50 * negatif
+                if j == 3:
+                    eval += 100 * negatif
+        return eval
+
+    def evaluer_comb(self, joueur):
         joueur_autre = 3 - joueur
         eval = 0
 

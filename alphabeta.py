@@ -5,10 +5,11 @@ import numpy as np
 
 
 class alpha_beta:
-    def __init__(self, grille, profondeur):
+    def __init__(self, grille, profondeur,evalval=2):
         self.grille = grille
         self.profondeur = profondeur
         self.joueur = 1
+        self.evalval = evalval
 
     def alpha_beta(self):
         action, eval_score = self.alpha_beta_rec(self.grille, self.profondeur, True, -np.inf, np.inf)
@@ -16,7 +17,7 @@ class alpha_beta:
 
     def alpha_beta_rec(self, grille, profondeur, actuel, alpha, beta):
         if profondeur == 0 or grille.verif_victoire():
-            evalu = grille.evaluer(self.joueur)
+            evalu = grille.evaluer(self.joueur,self.evalval)
             return None, evalu
 
         max_eval = -np.inf

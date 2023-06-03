@@ -13,6 +13,7 @@ class jouer:
         self.classchoix = None
         self.choixprof = None
         self.indexchoix = [0, 0]
+        self.choixeval = None
 
     def choix(self):
         self.classchoix = [0, 0]
@@ -29,12 +30,17 @@ class jouer:
         if choix == 1 or choix == 2:
             if self.choixprof == None:
                 self.choixprof = [0, 0]
+            if self.choixeval == None:
+                self.choixeval = [0, 0]
             if self.choixprof[index] == 0:
                 self.choixprof[index] = input("Quelle est la profondeur de l'IA ? : ")
+            if self.choixeval[index] == 0:
+                self.choixeval[index] = input("Quelle est l'évaluation de l'IA ? (1 évaluation position, 2 évaluation "
+                                              "combinaison) : ")
             if choix == 1:
-                self.classchoix[index] = minmax(self.grille, int(self.choixprof[index]))
+                self.classchoix[index] = minmax(self.grille, int(self.choixprof[index]), int(self.choixeval[index]))
             else:
-                self.classchoix[index] = alpha_beta(self.grille, int(self.choixprof[index]))
+                self.classchoix[index] = alpha_beta(self.grille, int(self.choixprof[index]), int(self.choixeval[index]))
         elif choix == 3:
             self.classchoix[index] = mcts(self.grille)
         elif choix == 4:

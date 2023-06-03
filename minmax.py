@@ -5,10 +5,11 @@ import numpy as np
 
 
 class minmax:
-    def __init__(self, grille, profondeur):
+    def __init__(self, grille, profondeur,evalval=2):
         self.grille = grille
         self.profondeur = profondeur
         self.joueur = grille.joueur_actuel
+        self.evalval = evalval
 
     def minmaxfunc(self):
         action, eval = self.minmax_rec(self.grille, self.profondeur, True)
@@ -16,7 +17,7 @@ class minmax:
 
     def minmax_rec(self, grille, profondeur, actuel):
         if profondeur == 0 or grille.verif_victoire():
-            evalu = grille.evaluer(self.joueur)
+            evalu = grille.evaluer(self.joueur,self.evalval)
             return None, evalu
         max_eval = -np.inf
         max_colonne = 0
