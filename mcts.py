@@ -3,6 +3,7 @@ import numpy as np
 import random
 import copy as cp
 
+
 class Node:
     def __init__(self, grille, joueur, parent=None, last_action=0):
         self.grille = grille  # La grille de jeu associée à ce nœud
@@ -32,7 +33,7 @@ class Node:
         if self.grille.verif_victoire():
             if joueur == self.grille.joueur_actuel:  # Si le joueur associé à ce nœud a gagné
                 # print("VICTOIRE")
-                return 50
+                return 2
             else:
                 # print("DEFAITE")
                 return 1
@@ -49,11 +50,26 @@ class mcts:
         for i in range(10000):
             node = self.treePolicy(root)
             self.defaultPolicy(node)
-            #self.backup(node, reward)
+            # self.backup(node, reward)
 
         # Sélectionne le meilleur enfant à partir du nœud racine
-        bestchild = self.bestChild(root)
+        print("Nombre de noeuds : ", self.compter_noeuds(root))
+        print("Nombre de niveaux : ", self.compter_niveau(root))
+        time.sleep(1)
+        bestchild = self.bestChild(root, 0)
         return bestchild.last_action
+
+    def compter_noeuds(self, node):
+        if node.children == []:
+            return 1
+        else:
+            return 1 + sum([self.compter_noeuds(child) for child in node.children])
+
+    def compter_niveau(self, node):
+        if node.children == []:
+            return 1
+        else:
+            return 1 + max([self.compter_niveau(child) for child in node.children])
 
     def treePolicy(self, node):
         # Applique la politique de sélection de l'arbre jusqu'à atteindre un nœud terminal
@@ -61,43 +77,43 @@ class mcts:
             if not node.isFullyExpanded:
                 return self.expand(node)
             else:
-                node = self.bestChild(node)
+                node = self.bestChild(node, 1.5)
         return node
 
     def expand(self, node):
         coups_possibles = node.grille.indices_cases_accessibles()
-        coups_restants = [coup for coup in coups_possibles if coup not in [child.last_action for child in node.children]]
+        coups_restants = [coup for coup in coups_possibles if
+                          coup not in [child.last_action for child in node.children]]
         '''print("COUPS POSSIBLES : ", coups_possibles)
         print("COUPS RESTANTS : ", coups_restants)
         print("GOSSES : ",len(node.children))
         time.sleep(1)'''
 
         # Si aucun coup possible ou tous les coups ont déjà été explorés, marquer le nœud comme complètement étendu
-        if not coups_possibles:
+        if not coups_possibles or len(coups_restants) == 0:
             node.isFullyExpanded = True
             return node
 
         # Si des coups restent à explorer, en choisir un aléatoirement et ajouter un nouvel enfant au nœud actuel
-        if coups_restants and not node.isFullyExpanded:
-            coup = random.choice(coups_restants)
-            grille_copie = cp.deepcopy(node.grille)
-            grille_copie.joueur_actuel = node.joueur
-            grille_copie.placer_jeton(coup)
-            '''print("GRILLE COPIE")
-            grille_copie.afficher_grille()
-            time.sleep(1)'''
-            node.addChild(grille_copie, 3 - node.joueur, coup)
-            return node.children[-1]
-        return node
+        coup = random.choice(coups_restants)
+        grille_copie = cp.deepcopy(node.grille)
+        grille_copie.joueur_actuel = node.joueur
+        grille_copie.placer_jeton(coup)
+        '''print("GRILLE COPIE")
+        grille_copie.afficher_grille()
+        time.sleep(1)'''
+        node.addChild(grille_copie, 3 - node.joueur, coup)
+        return node.children[-1]
 
-    def bestChild(self, node):
+
+    def bestChild(self, node, c):
         bestscore = -np.inf
         bestchildren = []
 
         # Trouve le meilleur score parmi les enfants du nœud donné
         for child in node.children:
             exploit = child.reward / child.visits
-            explore = 1.5 * np.sqrt((2.0 * np.log(node.visits)) / child.visits)
+            explore = c * np.sqrt((2.0 * np.log(node.visits)) / child.visits)
             # print("EXPLOIT",exploit)
             # print("EXPLORE",explore)
             score = exploit + explore
@@ -120,7 +136,7 @@ class mcts:
         while not node.is_terminal_state():
             node = random.choice(node.children) if node.children else self.expand(node)
             self.backup(node, node.reward_fct(self.joueur))
-        #return node.reward_fct(self.joueur)
+        # return node.reward_fct(self.joueur)
 
     def backup(self, node, reward):
         # Remonte l'arbre et met à jour les récompenses et les visites des nœuds
