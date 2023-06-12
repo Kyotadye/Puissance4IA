@@ -91,6 +91,8 @@ class puissance4:
                 return -10000
             else:
                 return 1000
+        elif self.nb_coups == 42:
+            return 0
         for i in range(self.taille_grille[0]):
             for j in range(self.taille_grille[1]):
                 if self.grille[i][j] == joueur:

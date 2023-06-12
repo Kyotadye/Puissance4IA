@@ -33,13 +33,13 @@ class Node:
         if self.grille.verif_victoire():
             if joueur == self.grille.joueur_actuel:  # Si le joueur associé à ce nœud a gagné
                 # print("VICTOIRE")
-                return 50
+                return 1
             else:
                 # print("DEFAITE")
-                return 1
+                return 50
         else:
-            # print("NUL")
-            return 0
+            #print("NUL")
+            return self.reward
 
 
 class mcts:
@@ -50,7 +50,7 @@ class mcts:
         for i in range(10000):
             node = self.treePolicy(root)
             self.defaultPolicy(node)
-            # self.backup(node, reward)
+            #self.backup(node, reward)
 
         # Sélectionne le meilleur enfant à partir du nœud racine
         print("Nombre de noeuds : ", self.compter_noeuds(root))
@@ -77,7 +77,7 @@ class mcts:
             if not node.isFullyExpanded:
                 return self.expand(node)
             else:
-                node = self.bestChild(node, 1.5)
+                node = self.bestChild(node)
         return node
 
     def expand(self, node):
@@ -106,7 +106,7 @@ class mcts:
         return node.children[-1]
 
 
-    def bestChild(self, node, c):
+    def bestChild(self, node, c=1.5):
         bestscore = -np.inf
         bestchildren = []
 
@@ -135,8 +135,8 @@ class mcts:
         # Effectue une politique par défaut aléatoire jusqu'à atteindre un nœud terminal
         while not node.is_terminal_state():
             node = random.choice(node.children) if node.children else self.expand(node)
-            self.backup(node, node.reward_fct(self.joueur))
-        # return node.reward_fct(self.joueur)
+        self.backup(node, node.reward_fct(self.joueur))
+        #return node.reward_fct(self.joueur)
 
     def backup(self, node, reward):
         # Remonte l'arbre et met à jour les récompenses et les visites des nœuds
