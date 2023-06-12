@@ -33,7 +33,7 @@ class Node:
         if self.grille.verif_victoire():
             if joueur == self.grille.joueur_actuel:  # Si le joueur associé à ce nœud a gagné
                 # print("VICTOIRE")
-                return 2
+                return 50
             else:
                 # print("DEFAITE")
                 return 1
